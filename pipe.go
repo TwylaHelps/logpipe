@@ -15,7 +15,7 @@ func mkFifo(path string) error {
 }
 
 func getFileReader(path string) (*bufio.Reader, error) {
-	file, err := os.OpenFile(path, os.O_CREATE, os.ModeNamedPipe)
+	file, err := os.OpenFile(path, os.O_RDONLY, os.ModeNamedPipe)
 	if err != nil {
 		return nil, err
 	}

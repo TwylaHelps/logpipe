@@ -8,6 +8,17 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func getTempFileName() string {
+	// Create and remove a temp file to make rather sure a file with that
+	// name does not yet exist.
+	temp, _ := ioutil.TempFile("", "")
+	name := temp.Name()
+	temp.Close()
+	os.Remove(name)
+
+	return name
+}
+
 func TestRemoveExisting(t *testing.T) {
 	temp, _ := ioutil.TempFile("", "")
 	name := temp.Name()
@@ -26,12 +37,7 @@ func TestRemoveExisting(t *testing.T) {
 }
 
 func TestMkFifo(t *testing.T) {
-	// Create and remove a temp file to make rather sure a file with that
-	// name does not yet exist.
-	temp, _ := ioutil.TempFile("", "")
-	name := temp.Name()
-	os.Remove(name)
-
+	name := getTempFileName()
 	_, err := os.Stat(name)
 	assert.True(t, os.IsNotExist(err), "File with desired name should should not exist")
 	err = mkFifo(name)
@@ -43,18 +49,14 @@ func TestMkFifo(t *testing.T) {
 }
 
 func TestGetFileReader(t *testing.T) {
-	// Create and remove a temp file to make rather sure a file with that
-	// name does not yet exist.
-	temp, _ := ioutil.TempFile("", "")
-	name := temp.Name()
-	os.Remove(name)
-
+	name := getTempFileName()
 	_, err := os.Stat(name)
 	assert.True(t, os.IsNotExist(err), "File with desired name should should not exist")
 	err = mkFifo(name)
 	defer os.Remove(name)
 	assert.Nil(t, err, "Creating the named pipe should not cause errors")
 
-	// _, err = getFileReader(name)
-	// assert.Nil(t, err, "Getting the pipe reader should not cause errors")
+	// TODO: hangs, waiting for feedback from #go-nuts
+	_, err = getFileReader(name)
+	assert.Nil(t, err, "Getting the pipe reader should not cause errors")
 }
